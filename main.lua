@@ -2,9 +2,13 @@ local turnSpeed = 10
 local shipCircleDistance = 20
 
 function love.load()
-    shipX = 800 / 2
-    shipY = 600 / 2
+    areaWidth = 800
+    areaHeight = 600
+    shipX = areaWidth / 2
+    shipY = areaHeight / 2
     shipAngle = 0
+    shipSpeedX = 0
+    shipSpeedY = 0
 end
 
 function love.update(dt)
@@ -14,16 +18,35 @@ function love.update(dt)
     if love.keyboard.isDown('left') then
         shipAngle = (shipAngle - turnSpeed * dt) % (2 * math.pi)
     end
+    if love.keyboard.isDown('up') then
+        local shipSpeed = 100
+        shipSpeedX = shipSpeedX + math.cos(shipAngle) * shipSpeed * dt
+        shipSpeedY = shipSpeedY + math.sin(shipAngle) * shipSpeed * dt
+    end
+    shipX = (shipX + shipSpeedX * dt) % areaWidth
+    shipY = (shipY + shipSpeedY * dt) % areaHeight
 end
 
-function love.draw()
-    love.graphics.setColor(0, 0, 1)
-    love.graphics.circle('fill', shipX, shipY, 30)
-    love.graphics.setColor(0, 1, 1)
-    love.graphics.circle('fill', shipX + math.cos(shipAngle) * shipCircleDistance, shipY + math.sin(shipAngle) * shipCircleDistance, 5)
+function love.draw()            
+    for y=-1, 1 do
+        for x = -1, 1 do
+            love.graphics.origin()
+            love.graphics.translate(x * areaWidth, y * areaHeight)
 
+            love.graphics.setColor(0, 0, 1)
+            love.graphics.circle('fill', shipX, shipY, 30)
+            love.graphics.setColor(0, 1, 1)
+            love.graphics.circle('fill', shipX + math.cos(shipAngle) * shipCircleDistance, shipY + math.sin(shipAngle) * shipCircleDistance, 5)
+        end
+    end
+    love.graphics.origin()
     love.graphics.setColor(1, 1, 1)
-    love.graphics.print('shipAngle: '..shipAngle)
+    love.graphics.print(table.concat({'shipAngle: '..shipAngle,
+    'shipX: '..shipX,
+    'shipY: '..shipY,
+    'shipSpeedX: '..shipSpeedX,
+    'shipSpeedY: '..shipSpeedY,
+}, '\n'))
 
 end
 

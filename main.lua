@@ -1,7 +1,7 @@
 local turnSpeed = 10
 local shipCircleDistance = 20
 local shipRadius = 30
-
+local bulletTimer = 0
 
 function love.load()
     areaWidth = 800
@@ -12,7 +12,7 @@ function love.load()
     shipSpeedX = 0
     shipSpeedY = 0
     bullets = {}
-end
+ end
 
 function love.update(dt)
     if love.keyboard.isDown('right') then
@@ -29,11 +29,31 @@ function love.update(dt)
     shipX = (shipX + shipSpeedX * dt) % areaWidth
     shipY = (shipY + shipSpeedY * dt) % areaHeight
 
-    for bulletIndex, bullet in ipairs(bullets) do   
-        local bulletSpeed = 500
-        bullet.x = (bullet.x + math.cos(bullet.angle) * bulletSpeed * dt) % areaWidth
-        bullet.y = (bullet.y + math.sin(bullet.angle) * bulletSpeed * dt) % areaHeight
+    bulletTimer = bulletTimer + dt
+    if love.keyboard.isDown('s') then
+        if bulletTimer >= 0.5 then
+            bulletTimer = 0
+            table.insert(bullets, {
+                x = shipX + math.cos(shipAngle) * shipRadius,
+                y = shipY + math.sin(shipAngle) * shipRadius,
+                angle = shipAngle,
+                timeLeft = 4,
+            })
+        end
     end
+
+    for bulletIndex = #bullets, 1, -1  do   
+        local bullet = bullets[bulletIndex]
+        bullet.timeLeft = bullet.timeLeft - dt
+        if bullet.timeLeft <= 0 then
+            table.remove(bullets, bulletIndex)
+        else
+            local bulletSpeed = 500
+            bullet.x = (bullet.x + math.cos(bullet.angle) * bulletSpeed * dt) % areaWidth
+            bullet.y = (bullet.y + math.sin(bullet.angle) * bulletSpeed * dt) % areaHeight
+        end
+    end
+
 end
 
 function love.draw()            
@@ -62,15 +82,5 @@ function love.draw()
     'shipSpeedY: '..shipSpeedY,
     }, '\n'))
 
-end
-
-function love.keypressed(key)
-    if key == 's' then
-        table.insert(bullets, {
-            x = shipX + math.cos(shipAngle) * shipRadius,
-            y = shipY + math.sin(shipAngle) * shipRadius,
-            angle = shipAngle,
-        })
-    end
 end
 

@@ -1,5 +1,6 @@
 local turnSpeed = 10
 local shipCircleDistance = 20
+local shipRadius = 30
 
 
 function love.load()
@@ -27,6 +28,12 @@ function love.update(dt)
     end
     shipX = (shipX + shipSpeedX * dt) % areaWidth
     shipY = (shipY + shipSpeedY * dt) % areaHeight
+
+    for bulletIndex, bullet in ipairs(bullets) do   
+        local bulletSpeed = 500
+        bullet.x = (bullet.x + math.cos(bullet.angle) * bulletSpeed * dt) % areaWidth
+        bullet.y = (bullet.y + math.sin(bullet.angle) * bulletSpeed * dt) % areaHeight
+    end
 end
 
 function love.draw()            
@@ -36,11 +43,11 @@ function love.draw()
             love.graphics.translate(x * areaWidth, y * areaHeight)
 
             love.graphics.setColor(0, 0, 1)
-            love.graphics.circle('fill', shipX, shipY, 30)
+            love.graphics.circle('fill', shipX, shipY, shipRadius)
             love.graphics.setColor(0, 1, 1)
             love.graphics.circle('fill', shipX + math.cos(shipAngle) * shipCircleDistance, shipY + math.sin(shipAngle) * shipCircleDistance, 5)
             
-            for bulletIndex, bullet in ipars(bullets) do
+            for bulletIndex, bullet in ipairs(bullets) do
                 love.graphics.setColor(0, 1, 0)
                 love.graphics.circle('fill', bullet.x, bullet.y, 5)
             end
@@ -60,8 +67,9 @@ end
 function love.keypressed(key)
     if key == 's' then
         table.insert(bullets, {
-            x = shipX,
-            y = shipY,
+            x = shipX + math.cos(shipAngle) * shipRadius,
+            y = shipY + math.sin(shipAngle) * shipRadius,
+            angle = shipAngle,
         })
     end
 end

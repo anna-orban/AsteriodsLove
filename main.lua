@@ -2,6 +2,7 @@ local turnSpeed = 10
 local shipCircleDistance = 20
 local shipRadius = 30
 local bulletTimer = 0
+local asteroidRadius =80
 
 function love.load()
     areaWidth = 800
@@ -33,6 +34,10 @@ function love.load()
  end
 
 function love.update(dt)
+    local function areCirclesIntersecting(aX, aY, aRadius, bX, bY, bRadius)
+        return (aX - bX)^2 + (aY - bY)^2 <= (aRadius - bRadius)^2
+    end
+
     if love.keyboard.isDown('right') then
         shipAngle = (shipAngle + turnSpeed * dt) % (2 * math.pi)
     end
@@ -76,6 +81,10 @@ function love.update(dt)
         local asteroidSpeed = 20
         asteroid.x = (asteroid.x + math.cos(asteroid.angle) * asteroidSpeed * dt) % areaWidth
         asteroid.y = (asteroid.y + math.sin(asteroid.angle) * asteroidSpeed * dt) % areaHeight
+        if areCirclesIntersecting(asteroid.x, asteroid.y, asteroidRadius, shipX, shipY, shipRadius) then
+            love.load()
+            break
+        end 
     end
 end
 
@@ -97,7 +106,7 @@ function love.draw()
 
             for asteroidIndex, asteroid in ipairs(asteroids) do
                 love.graphics.setColor(1, 1, 0)
-                love.graphics.circle('fill', asteroid.x, asteroid.y, 80)
+                love.graphics.circle('fill', asteroid.x, asteroid.y, asteroidRadius)
             end
         end
     end

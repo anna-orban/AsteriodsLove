@@ -12,6 +12,24 @@ function love.load()
     shipSpeedX = 0
     shipSpeedY = 0
     bullets = {}
+    asteroids = {
+        { 
+            x = 100,
+            y = 100,
+        },
+        {
+            x = areaWidth - 100,
+            y = 100,
+        },
+        {
+            x = areaWidth / 2,
+            y = areaHeight - 100,
+        }
+    }
+
+    for asteroidIndex, asteroid in ipairs(asteroids) do
+        asteroid.angle = love.math.random() * (2 * math.pi)
+    end
  end
 
 function love.update(dt)
@@ -54,6 +72,11 @@ function love.update(dt)
         end
     end
 
+    for asteroidIndex, asteroid in ipairs(asteroids) do
+        local asteroidSpeed = 20
+        asteroid.x = (asteroid.x + math.cos(asteroid.angle) * asteroidSpeed * dt) % areaWidth
+        asteroid.y = (asteroid.y + math.sin(asteroid.angle) * asteroidSpeed * dt) % areaHeight
+    end
 end
 
 function love.draw()            
@@ -70,6 +93,11 @@ function love.draw()
             for bulletIndex, bullet in ipairs(bullets) do
                 love.graphics.setColor(0, 1, 0)
                 love.graphics.circle('fill', bullet.x, bullet.y, 5)
+            end
+
+            for asteroidIndex, asteroid in ipairs(asteroids) do
+                love.graphics.setColor(1, 1, 0)
+                love.graphics.circle('fill', asteroid.x, asteroid.y, 80)
             end
         end
     end

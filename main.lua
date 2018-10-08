@@ -71,6 +71,11 @@ function love.update(dt)
         shipSpeedX = shipSpeedX + math.cos(shipAngle) * shipSpeed * dt
         shipSpeedY = shipSpeedY + math.sin(shipAngle) * shipSpeed * dt
     end
+    if love.keyboard.isDown('down') then
+        local shipSpeed = 100
+        shipSpeedX = shipSpeedX - math.cos(shipAngle) * shipSpeed * dt
+        shipSpeedY = shipSpeedY - math.sin(shipAngle) * shipSpeed * dt
+    end
     shipX = (shipX + shipSpeedX * dt) % areaWidth
     shipY = (shipY + shipSpeedY * dt) % areaHeight
 

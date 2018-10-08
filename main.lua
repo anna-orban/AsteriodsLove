@@ -5,8 +5,30 @@ local bulletTimer = 0
 local bulletRadius = 5
 
 function love.load()
-    areaWidth = 800
-    areaHeight = 600
+    areaWidth = love.graphics.getWidth()
+    areaHeight = love.graphics.getHeight()
+    asteroidStages = {
+        {
+            speed = 120,
+            radius = 15
+        },
+        {
+            speed = 70,
+            radius = 30
+        },
+        {
+            speed = 50,
+            radius = 50
+        },
+        {
+            speed = 20,
+            radius = 80
+        }
+    }
+    reset()
+end
+
+function reset()
     shipX = areaWidth / 2
     shipY = areaHeight / 2
     shipAngle = 0
@@ -27,31 +49,11 @@ function love.load()
             y = areaHeight - 100
         }
     }
-
-    asteroidStages = {
-        {
-            speed = 120,
-            radius = 15
-        },
-        {
-            speed = 70,
-            radius = 30
-        },
-        {
-            speed = 50,
-            radius = 50
-        },
-        {
-            speed = 20,
-            radius = 80
-        }
-    }
-
     for asteroidIndex, asteroid in ipairs(asteroids) do
         asteroid.angle = love.math.random() * (2 * math.pi)
         asteroid.stage = #asteroidStages
     end
- end
+end
 
 function love.update(dt)
     local function areCirclesIntersecting(aX, aY, aRadius, bX, bY, bRadius)
@@ -127,9 +129,13 @@ function love.update(dt)
         asteroid.x = (asteroid.x + math.cos(asteroid.angle) * asteroidStages[asteroid.stage].speed * dt) % areaWidth
         asteroid.y = (asteroid.y + math.sin(asteroid.angle) * asteroidStages[asteroid.stage].speed * dt) % areaHeight
         if areCirclesIntersecting(asteroid.x, asteroid.y, asteroidStages[asteroid.stage].radius, shipX, shipY, shipRadius) then
-            love.load()
+            reset()
             break
         end 
+    end
+
+    if #asteroids == 0 then
+        reset()
     end
 end
 
